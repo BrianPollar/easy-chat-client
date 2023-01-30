@@ -7,7 +7,6 @@ export type TchatMsgStatus =
   'recieved' |
   'viewed';
 
-
 export type TchatMsgWho =
   'me' |
   'partner';

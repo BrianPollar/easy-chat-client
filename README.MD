@@ -5,7 +5,7 @@
 easy-chat implements real-time bidirectional event-based communication. It consists of:
 
 - a Javascript client library (this repository)
-- a [Node Js Server](https://github.com/easy-chat/easy-chat) for the browser (or a Node.js client)
+- a [Node Js Server](https://github.com/BrianPollar/easy-chat-server) for the browser (or a Node.js client)
 
 Its main features are:
 
@@ -71,13 +71,11 @@ easyChatController.send("hello world");
 
 ## Documentation
 
-Please see the documentation [here](https://socket.io/docs/).
-
-The source code of the website can be found [here](https://github.com/socketio/socket.io-website). Contributions are welcome!
+The source code of the website can be found [here](https://github.com/BrianPollar/easy-chat-client). Contributions are welcome!
 
 ## Sponsors
 
-Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/socketio#sponsor)]
+Become a sponsor and get your logo on our README on Github with a link to your site.
 
 ## License
 
