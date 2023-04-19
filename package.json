@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsc",
     "test": "node ./__tests__/easy-chat-client.test.js",
-    "publish": "npm publish"
+    "publishGit": "npm publish"
   },
   "peerDependencies": {
     "rxjs": "^7.5.0",
