@@ -26,9 +26,9 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc",
+    "compileLib": "tsc",
     "test": "node ./__tests__/easy-chat-client.test.js",
-    "publishGit": "npm publish"
+    "publishLib": "npm publish"
   },
   "peerDependencies": {
     "rxjs": "^7.5.0",
@@ -44,6 +44,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.0.2",
     "rxjs": "^7.5.0",
     "socket.io-client": "^4.5.3"
   }

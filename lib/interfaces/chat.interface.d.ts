@@ -25,6 +25,7 @@ export interface IpeerInfo {
     photo: string;
     name: string;
     roomAdmin: boolean;
+    lastSeen: Date;
     online: boolean;
     unviewedMsgsLength: number;
 }

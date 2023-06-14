@@ -28,6 +28,7 @@ export interface IpeerInfo {
   photo: string;
   name: string;
   roomAdmin: boolean; // super cow powers
+  lastSeen: Date,
   online: boolean;
   unviewedMsgsLength: number; // number of unseen messages
 }

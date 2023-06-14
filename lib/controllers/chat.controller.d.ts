@@ -37,6 +37,7 @@ export declare class EasyChatController {
     updateRoom(roomData: any, add: boolean /** add to array or remove if false */): Promise<unknown>;
     newRoom(room: ChatRoom): Promise<unknown>;
     clearRoom(): void;
+    scrollToLast(): void;
     private mangeNewMainPeers;
     private manageMainPeerLeave;
     private newPeer;

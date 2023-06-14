@@ -50,6 +50,7 @@ export class EasyChatController {
             });
 
           this.messages = [...this.messages, msg];
+          this.scrollToLast();
           this.updateStatus('recieved', msg);
         }
 
@@ -132,6 +133,7 @@ export class EasyChatController {
       name: this.myNames,
       photo: this.myPhotoUrl,
       roomAdmin: false,
+      lastSeen: new Date(),
       online: true,
       unviewedMsgsLength: 0
     };
@@ -139,6 +141,9 @@ export class EasyChatController {
   }
 
   async joinRoom() {
+    if (!this.activeRoom) {
+      return;
+    }
     const { joined, peers } = await this
       .join(this.determinLocalPeerInfo());
 
@@ -155,7 +160,7 @@ export class EasyChatController {
 
   async joinMainRoom() {
     const { joined, peers } = await this
-      .join(this.determinLocalPeerInfo());
+      .joinMain(this.determinLocalPeerInfo());
 
     if (joined) {
       return;
@@ -204,6 +209,7 @@ export class EasyChatController {
     );
 
     this.messages = [...this.messages, msg];
+    this.scrollToLast();
 
     this.websocket.sendRequest(
       ECHATMETHOD.CHAT_MESSAGE,
@@ -217,7 +223,8 @@ export class EasyChatController {
       }
     ).then(() => {
       msg.status = 'sent';
-    }).catch(() => {
+    }).catch(err => {
+      this.logger.error('send MESSAGE ERROR', err);
       msg.status = 'failed';
     });
   }
@@ -285,7 +292,11 @@ export class EasyChatController {
     if (this.websocket.isSocketConnected()) {
       if (this.activeRoom) {
         // this.sendClosePeer(false);
-        this.clearRoom();
+        if (this.activeRoom.id !== room.id) {
+          this.clearRoom();
+        } else {
+          return;
+        }
       }
     } else {
       this.websocket.connect();
@@ -305,6 +316,11 @@ export class EasyChatController {
     this.activeRoom = null as any;
     this.messages.length = 0;
     this.messages = [];
+  }
+
+  scrollToLast() {
+    const elem = document?.getElementById('scroll-after-msg');
+    elem.scrollIntoView();
   }
 
   private mangeNewMainPeers(peers: IpeerInfo[]) {
@@ -337,6 +353,7 @@ export class EasyChatController {
       muted: data.muted,
       online: data.online,
       whoType: data.whoType,
+      lastSeen: new Date(),
       unviewedMsgsLength: data.unviewedMsgsLength
     };
     this.logger.debug('newPeer, %o', peer);
