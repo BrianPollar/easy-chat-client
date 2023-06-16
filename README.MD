@@ -56,9 +56,9 @@ The following example inits easy-chat-client and gets the chat client and chat c
 import { initEasyChat } from "easy-chat-client";
 
 const { easyChatClient, easyChatController } = initEasyChat(
-  url, // server url
+  url, // web socket server url
   userId, // current user uniques, its is importnat that this stays unique throughout your application
-  userNames, // user names
+  userNames, // user names probably from the users profile
   userPhotoUrl // absolute file url for the user photo
 );
 
