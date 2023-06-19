@@ -8,7 +8,7 @@ import { EasyChatClient } from '../websocket';
 /** Handle CHAT related Task*/
 export declare class EasyChatController {
     websocket: EasyChatClient;
-    private eventbus;
+    eventbus: EventbusController;
     private logger;
     private myId;
     private myNames;

@@ -20,7 +20,7 @@ export class EasyChatController {
 
   constructor(
     public websocket: EasyChatClient,
-    private eventbus: EventbusController,
+    public eventbus: EventbusController,
     private logger: LoggerController,
     private myId: string,
     private myNames: string,
