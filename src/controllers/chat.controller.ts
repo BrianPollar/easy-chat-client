@@ -19,7 +19,7 @@ export class EasyChatController {
   destroyed$ = new Subject();
 
   constructor(
-    private websocket: EasyChatClient,
+    public websocket: EasyChatClient,
     private eventbus: EventbusController,
     private logger: LoggerController,
     private myId: string,

@@ -7,7 +7,7 @@ import { LoggerController } from './logger.controller';
 import { EasyChatClient } from '../websocket';
 /** Handle CHAT related Task*/
 export declare class EasyChatController {
-    private websocket;
+    websocket: EasyChatClient;
     private eventbus;
     private logger;
     private myId;
