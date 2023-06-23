@@ -1,5 +1,5 @@
-import { BehaviorSubject } from "rxjs";
-import { ECHATMETHOD } from "../enums/chat.enum";
+import { BehaviorSubject } from 'rxjs';
+import { ECHATMETHOD } from '../enums/chat.enum';
 
 export interface IchatEvent {
   type: ECHATMETHOD;

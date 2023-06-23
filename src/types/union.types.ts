@@ -1,4 +1,4 @@
-import { ECHATMETHOD } from "../enums/chat.enum";
+import { ECHATMETHOD } from '../enums/chat.enum';
 
 export type TchatMsgStatus =
   'sent' |

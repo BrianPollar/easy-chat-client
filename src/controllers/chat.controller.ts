@@ -91,14 +91,14 @@ export class EasyChatController {
           const { to, id, statusField, statusQuo, status } = event.data;
           const msg = this.messages
             .find(val => val.id === id);
-            if(msg){
-          msg.status = status;
-          const exist = msg[statusField]
-            .find(val => val.id === statusQuo.id);
-          if (!exist) {
-            msg[statusField].push(statusQuo);
+          if (msg) {
+            msg.status = status;
+            const exist = msg[statusField]
+              .find(val => val.id === statusQuo.id);
+            if (!exist) {
+              msg[statusField].push(statusQuo);
+            }
           }
-        }
           if (status === 'viewed') {
             this.eventbus.outEvent.next({
               type: 'viewed',

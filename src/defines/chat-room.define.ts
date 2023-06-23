@@ -1,8 +1,63 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { lastValueFrom } from 'rxjs';
 import { makeRandomString } from '../constants/makerandomstring.constant';
 import { IchatMsg, IchatRoom, IpeerInfo } from '../interfaces/chat.interface';
 import { TchatMsgStatus, TchatMsgWho } from '../types/union.types';
+import { faker } from '@faker-js/faker';
+
+export const createMockChat = () => {
+  return {
+    id: faker.string.uuid(),
+    createTime: faker.date.past()
+  };
+};
+
+export const createMockPeerinfo = () => {
+  return {
+    id: faker.string.uuid(),
+    photo: faker.image.avatar(),
+    name: faker.internet.userName(),
+    roomAdmin: faker.string.uuid(),
+    lastSeen: faker.date.past(),
+    online: false// number of unseen messages
+  };
+};
+
+
+export const createChatRoom = (incrementor = 0) => {
+  const room = {
+    ...createMockChat(),
+    lastActive: faker.date.past(),
+    peers: [createMockPeerinfo(), createMockPeerinfo()],
+    blocked: [],
+    unviewedMsgsLength: 10,
+    type: incrementor % 2 ? 'solo' : 'bargain',
+    closed: false
+  };
+
+  return new ChatRoom(room as any);
+};
+
+export const createChatRooms = (length: number) => {
+  return Array.from({ length }).map((val, index) => (index));
+};
+
+
+export const createMockChatMsg = (incrementor = 0) => {
+  const msg = {
+    ...createMockChat(),
+    peerInfo: createMockPeerinfo(),
+    roomId: faker.string.uuid(),
+    msg: faker.string.alphanumeric(),
+    who: incrementor % 2 ? 'me' : 'partner',
+    status: 'sent',
+    deleted: false
+  };
+  return new ChatMsg(faker.string.uuid(), msg as any);
+};
+
+export const createMockChatMsgs = (length: number) => {
+  return Array.from({ length }).map((val, index) => createMockChatMsg(index));
+};
 
 export abstract class Chat {
   id: string;
@@ -20,9 +75,6 @@ export abstract class Chat {
     };
   }
 }
-
-
-
 
 
 export class ChatRoom
@@ -96,19 +148,6 @@ export class ChatRoom
     return null;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export class ChatMsg

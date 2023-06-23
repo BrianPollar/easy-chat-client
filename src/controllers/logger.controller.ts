@@ -1,5 +1,3 @@
-const APP_NAME = 'easy-chat-client';
-
 export class LoggerController {
   private pDebug = console.info.bind(console);
   private pWarn = console.warn.bind(console);

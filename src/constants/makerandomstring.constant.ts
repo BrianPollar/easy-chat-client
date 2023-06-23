@@ -1,4 +1,4 @@
-import { Tmkrandomstringhow } from "../types/union.types";
+import { Tmkrandomstringhow } from '../types/union.types';
 
 export const makeRandomString = (
   length: number,

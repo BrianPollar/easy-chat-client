@@ -9,7 +9,7 @@ const requestTimeout = 10000;
 const chatNotificationMap = new Map<string, string>();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const chatNotification = (ref: string = '') => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+const chatNotification = (ref = '') => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
   if (ref) {
     chatNotificationMap.set(ref, propertyKey);
   } else {
@@ -18,25 +18,24 @@ const chatNotification = (ref: string = '') => (target, propertyKey: string, des
 };
 
 
-
 export const initEasyChat = (
-  url: string, 
-  userId: string, 
-  userNames: string, 
-  userPhotoUrl: string,
-  
-  ) => {
+  url: string,
+  userId: string,
+  userNames: string,
+  userPhotoUrl: string
+
+) => {
   const easyChatClient = new EasyChatClient(url, userId);
   const easyChatController = new EasyChatController(
-    easyChatClient, new EventbusController(), 
+    easyChatClient, new EventbusController(),
     new LoggerController(),
     userId,
     userNames,
     userPhotoUrl
-    );
-    easyChatClient.connect()
-    return { easyChatClient, easyChatController };
-}
+  );
+  easyChatClient.connect();
+  return { easyChatClient, easyChatController };
+};
 
 
 export class EasyChatClient {
@@ -49,7 +48,7 @@ export class EasyChatClient {
   constructor(
     private url: string,
     private id: string
-  ) { 
+  ) {
     this.eventbus = new EventbusController();
     this.logger = new LoggerController();
   }
@@ -153,7 +152,7 @@ export class EasyChatClient {
 
   connect(
     id = this.id,
-    url= this.url
+    url = this.url
   ) {
     const socketUrl =
       // eslint-disable-next-line max-len
