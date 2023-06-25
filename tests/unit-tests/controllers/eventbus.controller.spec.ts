@@ -1,4 +1,4 @@
-import { vi, expect, describe, beforeEach, it } from 'vitest';
+import { expect, describe, beforeEach, it } from 'vitest';
 import { EventbusController } from '../../../src/controllers/eventbus.controller';
 
 describe('EventbusController', () => {
@@ -7,7 +7,6 @@ describe('EventbusController', () => {
   beforeEach(() => {
     instance = new EventbusController();
   });
-
 
   it('its real instance of AuthController', () => {
     expect(instance).toBeInstanceOf(EventbusController);

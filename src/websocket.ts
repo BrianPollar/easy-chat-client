@@ -4,6 +4,12 @@ import { EventbusController } from './controllers/eventbus.controller';
 import { LoggerController } from './controllers/logger.controller';
 import { ECHATMETHOD } from './enums/chat.enum';
 
+export interface IsendOnlineSoloRequestRes {
+  success: boolean;
+  response?;
+  err?;
+}
+
 const requestTimeout = 10000;
 
 const chatNotificationMap = new Map<string, string>();
@@ -142,6 +148,10 @@ export class EasyChatClient {
     });
   }
 
+  get currSocket() {
+    return this.socket;
+  }
+
   isSocketConnected() {
     return Boolean(this.socket?.connected);
   }
@@ -158,7 +168,7 @@ export class EasyChatClient {
       // eslint-disable-next-line max-len
       `${url}/?userId=${id}`;
 
-    this.logger.debug('WebsocketService:connect:: - socketUrl : %s', socketUrl);
+    this.logger.debug('EasyChatClient:connect:: - socketUrl : %s', socketUrl);
 
     this.socket = io(socketUrl, {
       timeout: 3000,
@@ -174,7 +184,7 @@ export class EasyChatClient {
   sendRequest(method, data?) {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
-        this.logger.error('WebsocketService:connect:: -', 'No socket connection');
+        this.logger.error('EasyChatClient:connect:: -', 'No socket connection');
         reject('No socket connection');
       } else {
         this.socket.emit('mainrequest', { method, data },
@@ -197,7 +207,7 @@ export class EasyChatClient {
   sendOnlineSoloRequest(method, data?) {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
-        this.logger.error('WebsocketService:sendOnlineSoloRequest:: - connect -', 'No socket connection');
+        this.logger.error('EasyChatClient:sendOnlineSoloRequest:: - connect -', 'No socket connection');
         reject('No socket connection');
       } else {
         this.socket.emit('onlinerequest', { method, data },
@@ -224,7 +234,7 @@ export class EasyChatClient {
         return;
       }
       called = true;
-      this.logger.error('WebsocketService:connect:: -', 'nowRequest timeout');
+      this.logger.error('EasyChatClient:connect:: -', 'nowRequest timeout');
       callback(new Error('nowRequest timeout'));
     }, requestTimeout);
 
@@ -241,7 +251,7 @@ export class EasyChatClient {
 
   disconnect() {
     if (this.socket.disconnected) {
-      this.logger.debug('WebsocketService:disconnect:: - socket already disconnected');
+      this.logger.debug('EasyChatClient:disconnect:: - socket already disconnected');
       return;
     }
     this.socket.disconnect();
@@ -249,23 +259,23 @@ export class EasyChatClient {
 
   private setupEventHandler(socket: Socket) {
     socket.on('connect', () => {
-      this.logger.debug('WebsocketService:setupEventHandler:: - socket connected !');
+      this.logger.debug('EasyChatClient:setupEventHandler:: - socket connected !');
       this.eventbus.chat$.next({
         type: ECHATMETHOD.SOCKET_CONNECTED
       });
     });
 
     socket.on('connect_error', () => {
-      this.logger.warn('WebsocketService:setupEventHandler:: - reconnect_failed !');
+      this.logger.warn('EasyChatClient:setupEventHandler:: - reconnect_failed !');
     });
 
     socket.on('connect_timeout', () => {
-      this.logger.warn('WebsocketService:setupEventHandler:: - connect_timeout !');
+      this.logger.warn('EasyChatClient:setupEventHandler:: - connect_timeout !');
     });
 
     socket.on('disconnect', (reason) => {
       this.logger.error(
-        'WebsocketService:setupEventHandler:: - Socket disconnect, reason: %s',
+        'EasyChatClient:setupEventHandler:: - Socket disconnect, reason: %s',
         reason);
       this.eventbus.chat$.next({
         type: ECHATMETHOD.SOCKET_DISCONNECTED
@@ -273,11 +283,11 @@ export class EasyChatClient {
     });
 
     socket.on('reconnect', attemptNumber => {
-      this.logger.debug('WebsocketService:setupEventHandler:: - "reconnect" event [attempts:"%s"]', attemptNumber);
+      this.logger.debug('EasyChatClient:setupEventHandler:: - "reconnect" event [attempts:"%s"]', attemptNumber);
     });
 
     socket.on('reconnect_failed', () => {
-      this.logger.warn('WebsocketService:setupEventHandler:: - reconnect_failed !');
+      this.logger.warn('EasyChatClient:setupEventHandler:: - reconnect_failed !');
     });
   }
 
@@ -286,12 +296,12 @@ export class EasyChatClient {
     const socket = this.socket;
     socket.on('mainnotification', (request) => {
       this.logger.debug(
-        'WebsocketService:setupNotificationHandler:: - mainnotification event, method: %s,data: %o', request.method, request.data
+        'EasyChatClient:setupNotificationHandler:: - mainnotification event, method: %s,data: %o', request.method, request.data
       );
 
       const regiMethod = chatNotificationMap.get(request.method);
       if (!regiMethod) {
-        this.logger.warn('WebsocketService:setupNotificationHandler:: - mainnotification method: %s, do not register!', request.method);
+        this.logger.warn('EasyChatClient:setupNotificationHandler:: - mainnotification method: %s, do not register!', request.method);
         return;
       }
 

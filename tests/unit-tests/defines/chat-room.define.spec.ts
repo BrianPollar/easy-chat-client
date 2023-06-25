@@ -1,4 +1,4 @@
-import { vi, expect, describe, beforeEach, it } from 'vitest';
+import { expect, describe, beforeEach, it } from 'vitest';
 import { ChatRoom, ChatMsg, createChatRoom, createMockChatMsg } from '../../../src/defines/chat-room.define';
 
 describe('ChatRoom', () => {
@@ -8,39 +8,27 @@ describe('ChatRoom', () => {
     instance = createChatRoom();
   });
 
-
-  it('its real instance of AuthController', () => {
-    expect(instance).toBeInstanceOf(AuthController);
+  it('should be a real instance of ChatRoom', () => {
+    expect(instance).toBeInstanceOf(ChatRoom);
   });
 
-  it('check authenticated', () => {
-    expect(instance.isLoggedIn).toBe(false);
+  it('should have methods undefined', () => {
+    expect(instance.lastActive).toBeUndefined();
+    expect(instance.lastActive).toBe(typeof Date);
+    expect(instance.peers).toBeUndefined();
+    expect(instance.peers).toBe(typeof Array.isArray);
+    expect(instance.blocked).toBeUndefined();
+    expect(instance.blocked).toBe(typeof Array.isArray);
+    expect(instance.unviewedMsgsLength).toBeUndefined();
+    expect(instance.unviewedMsgsLength).toBe(typeof Number);
+    expect(instance.type).toBeUndefined();
+    expect(instance.type).toBe(typeof 'string');
+    expect(instance.extras).toBeUndefined();
   });
 
-  it('chech confirm enabled', () => {
-    expect(instance.confirmEnabled).toBe(false);
-  });
-
-  it('should get the current stockAuthClientInstance', () => {
-    expect(stockAuthClientInstance).toBeInstanceOf(StockAuthClient);
-    expect(StockAuthClient.ehttp).toBeDefined();
-    expect(StockAuthClient.logger).toBeDefined();
-  });
-
-  it('should login user', async() => {
-    expect(await instance.login(userInfo as any)).toStrictEqual(mockValue);
-  });
-
-  it('should recover user', async() => {
-    expect(await instance.recover(userInfo as any)).toStrictEqual(mockValue);
-  });
-
-  it('should confirm user', async() => {
-    expect(await instance.confirm(userInfo as any, '/')).toStrictEqual(mockValue);
-  });
-
-  it('should make socialLogin', async() => {
-    expect(await instance.socialLogin(userInfo as any)).toStrictEqual(mockValue);
+  it('should have methods defined', () => {
+    expect(instance.closed).toBeDefined();
+    expect(instance.closed).toBe(false);
   });
 });
 
@@ -52,38 +40,15 @@ describe('ChatMsg', () => {
     instance = createMockChatMsg();
   });
 
-
-  it('its real instance of AuthController', () => {
-    expect(instance).toBeInstanceOf(AuthController);
+  it('its real instance of ChatMsg', () => {
+    expect(instance).toBeInstanceOf(ChatMsg);
   });
 
-  it('check authenticated', () => {
-    expect(instance.isLoggedIn).toBe(false);
-  });
-
-  it('chech confirm enabled', () => {
-    expect(instance.confirmEnabled).toBe(false);
-  });
-
-  it('should get the current stockAuthClientInstance', () => {
-    expect(stockAuthClientInstance).toBeInstanceOf(StockAuthClient);
-    expect(StockAuthClient.ehttp).toBeDefined();
-    expect(StockAuthClient.logger).toBeDefined();
-  });
-
-  it('should login user', async() => {
-    expect(await instance.login(userInfo as any)).toStrictEqual(mockValue);
-  });
-
-  it('should recover user', async() => {
-    expect(await instance.recover(userInfo as any)).toStrictEqual(mockValue);
-  });
-
-  it('should confirm user', async() => {
-    expect(await instance.confirm(userInfo as any, '/')).toStrictEqual(mockValue);
-  });
-
-  it('should make socialLogin', async() => {
-    expect(await instance.socialLogin(userInfo as any)).toStrictEqual(mockValue);
+  it('should have methods undefined', () => {
+    expect(instance.roomId).toBeUndefined();
+    expect(instance.msg).toBeUndefined();
+    expect(instance.who).toBeUndefined();
+    expect(instance.status).toBeUndefined();
+    expect(instance.deleted).toBeUndefined();
   });
 });

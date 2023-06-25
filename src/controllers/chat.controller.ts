@@ -211,7 +211,7 @@ export class EasyChatController {
     this.messages = [...this.messages, msg];
     this.scrollToLast();
 
-    this.websocket.sendRequest(
+    return this.websocket.sendRequest(
       ECHATMETHOD.CHAT_MESSAGE,
       {
         id,
@@ -231,7 +231,7 @@ export class EasyChatController {
 
 
   updateStatus(status: TchatMsgStatus, msg: ChatMsg) {
-    this.websocket.sendRequest(
+    return this.websocket.sendRequest(
       ECHATMETHOD.UPDATE_STATUS,
       {
         id: msg.id,
@@ -320,7 +320,7 @@ export class EasyChatController {
 
   scrollToLast() {
     const elem = document?.getElementById('scroll-after-msg');
-    elem.scrollIntoView();
+    elem?.scrollIntoView();
   }
 
   private mangeNewMainPeers(peers: IpeerInfo[]) {
