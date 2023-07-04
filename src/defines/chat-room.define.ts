@@ -23,7 +23,7 @@ export const createMockPeerinfo = () => {
 };
 
 
-export const createChatRoom = (incrementor = 0) => {
+export const createMockChatRoom = (incrementor = 0) => {
   const room = {
     ...createMockChat(),
     lastActive: faker.date.past(),
@@ -37,7 +37,7 @@ export const createChatRoom = (incrementor = 0) => {
   return new ChatRoom(room as any);
 };
 
-export const createChatRooms = (length: number) => {
+export const createMockChatRooms = (length: number) => {
   return Array.from({ length }).map((val, index) => (index));
 };
 
@@ -96,18 +96,6 @@ export class ChatRoom
     this.type = room.type;
     this.extras = room.extras;
     this.closed = room.closed;
-  }
-
-  static makeRoomDummy(incrementor = 0) {
-    return {
-      ...Chat.makeChatDummy(incrementor),
-      lastActive: new Date(),
-      peers: [],
-      blocked: [],
-      unviewedMsgsLength: 2,
-      type: 'solo',
-      closed: false
-    };
   }
 
   update(val, add: boolean) {
@@ -174,23 +162,5 @@ export class ChatMsg
     }
     this.status = msg.status;
     this.deleted = msg.deleted;
-  }
-
-  static makeMsgDummy(incrementor = 0) {
-    return {
-      ...Chat.makeChatDummy(),
-      peerInfo: {
-        id: makeRandomString(11, 'combined'),
-        photo: '',
-        name: 'name_' + makeRandomString(11, 'combined'),
-        roomAdmin: true,
-        online: false
-      },
-      msg: makeRandomString(771, 'letters'),
-      createTime: new Date(),
-      who: incrementor % 2 ? 'partner' : 'me',
-      status: 'sent',
-      deleted: false
-    };
   }
 }

@@ -33,8 +33,7 @@ export const initEasyChat = (
 ) => {
   const easyChatClient = new EasyChatClient(url, userId);
   const easyChatController = new EasyChatController(
-    easyChatClient, new EventbusController(),
-    new LoggerController(),
+    easyChatClient,
     userId,
     userNames,
     userPhotoUrl

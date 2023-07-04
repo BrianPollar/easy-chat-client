@@ -17,11 +17,11 @@ export class EasyChatController {
   toPeer = 'all';
   activeRoom: ChatRoom;
   destroyed$ = new Subject();
+  eventbus = new EventbusController();
+  logger = new LoggerController();
 
   constructor(
     public websocket: EasyChatClient,
-    public eventbus: EventbusController,
-    private logger: LoggerController,
     private myId: string,
     private myNames: string,
     private myPhotoUrl: string
@@ -244,7 +244,7 @@ export class EasyChatController {
   }
 
   deleteRestoreMesage(id: string, deleted: boolean) {
-    this.websocket.sendRequest(
+    return this.websocket.sendRequest(
       ECHATMETHOD.DELETE_MESSAGE,
       {
         deleted,
@@ -255,7 +255,7 @@ export class EasyChatController {
     ).then(() => true).catch(() => false);
   }
 
-  sendClosePeer(stopClass) {
+  sendClosePeer(stopClass: boolean) {
     this.logger.debug('sendClosePeer');
     return this.websocket.sendRequest(
       ECHATMETHOD.CLOSE_PEER,
