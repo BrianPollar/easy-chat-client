@@ -9,3 +9,6 @@ export * from './controllers/eventbus.controller';
 
 // This file exports all of the contents of the `chat-room.define` file.
 export * from './defines/chat-room.define';
+
+// This file exports all of the enum for chat event.
+export * from './enums/chat.enum';

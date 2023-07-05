@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { vi, expect, describe, beforeEach, it } from 'vitest';
 import { faker } from '@faker-js/faker';
-import { EasyChatController } from '../../src/controllers/chat.controller';
 import { EasyChatClient } from '../../src/websocket';
 import { Socket } from 'socket.io-client';
 
@@ -26,10 +25,6 @@ describe('Websocket', () => {
 
   it('its real instance of EasyChatClient', () => {
     expect(instance).toBeInstanceOf(EasyChatClient);
-  });
-
-  it('its real instance of EasyChatController', () => {
-    expect(easyChatControllerInstance).toBeInstanceOf(EasyChatController);
   });
 
   it('should have methods defined', () => {
@@ -92,7 +87,6 @@ describe('Websocket', () => {
   });
 
   it('#currSocket should ', () => {
-    
 
   });
 

@@ -188,7 +188,6 @@ export class EasyChatController {
   }
 
   send(chatMessage: string) {
-    console.log('JUST MAY BE SENDING IS BEING DONE TWICE');
     const id = this.activeRoom.id + makeRandomString(22, 'combined');
     const createTime = new Date();
     const msg = new ChatMsg(
