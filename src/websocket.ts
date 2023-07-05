@@ -46,8 +46,8 @@ export const initEasyChat = (
 export class EasyChatClient {
   static mode: string;
   activeUsers = new Map<string, string>();
+  eventbus: EventbusController;
   private socket: Socket;
-  private eventbus: EventbusController;
   private logger: LoggerController;
 
   constructor(

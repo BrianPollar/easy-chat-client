@@ -5,10 +5,8 @@ import { IpeerInfo } from '../interfaces/chat.interface';
 import { makeRandomString } from '../constants/makerandomstring.constant';
 import { TchatMsgStatus } from '../types/union.types';
 import { autoUnsub } from '../decorators/class.decorators';
-import { EventbusController } from './eventbus.controller';
 import { LoggerController } from './logger.controller';
 import { EasyChatClient } from '../websocket';
-
 
 /** Handle CHAT related Task*/
 @autoUnsub()
@@ -17,7 +15,6 @@ export class EasyChatController {
   toPeer = 'all';
   activeRoom: ChatRoom;
   destroyed$ = new Subject();
-  eventbus = new EventbusController();
   logger = new LoggerController();
 
   constructor(
@@ -26,7 +23,7 @@ export class EasyChatController {
     private myNames: string,
     private myPhotoUrl: string
   ) {
-    this.eventbus.chat$
+    this.websocket.eventbus.chat$
       .pipe(takeUntil((this as this&{destroyed$}).destroyed$))
       .subscribe(event => {
         if (event && event.type === ECHATMETHOD.CHAT_MESSAGE) {
@@ -100,7 +97,7 @@ export class EasyChatController {
             }
           }
           if (status === 'viewed') {
-            this.eventbus.outEvent.next({
+            this.websocket.eventbus.outEvent.next({
               type: 'viewed',
               data: this.activeRoom.unviewedMsgsLength
             });
@@ -327,13 +324,13 @@ export class EasyChatController {
     for (const peer of peers) {
       this.websocket.activeUsers.set(peer.id, peer.id);
     }
-    this.eventbus.userOnlineChange$.next(true);
+    this.websocket.eventbus.userOnlineChange$.next(true);
   }
 
   private manageMainPeerLeave(data) {
     const { peerId } = data;
     this.websocket.activeUsers.delete(peerId);
-    this.eventbus.userOnlineChange$.next(true);
+    this.websocket.eventbus.userOnlineChange$.next(true);
   }
 
   private newPeer(data: any) {

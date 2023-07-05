@@ -1,36 +1,38 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { vi, expect, describe, beforeEach, it, afterAll } from 'vitest';
+import { vi, expect, describe, beforeEach, it } from 'vitest';
 import { EasyChatController } from '../../../src/controllers/chat.controller';
 import { EasyChatClient } from '../../../src/websocket';
 import { faker } from '@faker-js/faker';
-import { constructClient } from '../../integration-tests/websocket.spec';
-import { Server } from 'socket.io';
 import { createMockChatRoom, createMockPeerinfo } from '../../../src/defines/chat-room.define';
+import { EventbusController } from '../../../src/controllers/eventbus.controller';
+
+const websocketMock = {
+  sendOnlineSoloRequest: vi.fn(),
+  sendRequest: vi.fn(),
+  activeUsers: new Map<string, string>(),
+  isSocketConnected: vi.fn(),
+  connect: vi.fn(),
+  eventbus: new EventbusController()
+} as unknown as EasyChatClient;
 
 describe('ChatController', () => {
   let instance: EasyChatController;
-  let easyChatClientInstance: EasyChatClient;
-  let serverSocket: Server;
+  const myId = faker.string.uuid();
+  const myNames = faker.internet.userName();
+  const myPhotoUrl = faker.image.avatar();
 
   beforeEach((done: any) => {
-    const { easyChatClient, easyChatController, io } = constructClient();
-    instance = easyChatController;
-    easyChatClientInstance = easyChatClient;
-    easyChatClientInstance.connect();
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
-  });
-
-  afterAll(() => {
-    easyChatClientInstance.disconnect();
-    serverSocket.close();
+    instance = new EasyChatController(
+      websocketMock,
+      myId,
+      myNames,
+      myPhotoUrl
+    );
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
   });
 
   it('its real instance of EasyChatController', () => {
     expect(instance).toBeInstanceOf(EasyChatController);
-  });
-
-  it('its real instance of EasyChatClient', () => {
-    expect(easyChatClientInstance).toBeInstanceOf(EasyChatClient);
   });
 
   it('should have props undefined', () => {
@@ -56,7 +58,7 @@ describe('ChatController', () => {
   });
 
   it('#joinRoom should join room', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     const joined = await instance.joinRoom();
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -64,7 +66,7 @@ describe('ChatController', () => {
   });
 
   it('#joinMainRoom should joinMainRoom', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
+    vi.spyOn(instance.websocket, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     const joined = await instance.joinMainRoom();
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -74,7 +76,7 @@ describe('ChatController', () => {
   });
 
   it('#joinMain should be called', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
+    vi.spyOn(instance.websocket, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     const joined = await instance.joinMain(instance.determinLocalPeerInfo());
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -84,7 +86,7 @@ describe('ChatController', () => {
   });
 
   it('#join should be called', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     const joined = await instance.join(instance.determinLocalPeerInfo());
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -92,7 +94,7 @@ describe('ChatController', () => {
   });
 
   it('#send should send message', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const message = faker.string.alphanumeric();
     const sent = await instance.send(message);
     expect(sent).toBe(null);
@@ -100,7 +102,7 @@ describe('ChatController', () => {
   });
 
   it('#updateStatus should update message status', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const status = 'sent';
     const chatMsgInstance = instance.messages[0];
     const updated = await instance.updateStatus(status, chatMsgInstance);
@@ -110,7 +112,7 @@ describe('ChatController', () => {
   });
 
   it('#deleteRestoreMesage should make delete or restore message', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const id = faker.string.uuid();
     const updated = await instance.deleteRestoreMesage(id, true);
     expect(updated).toBe(true);
@@ -119,14 +121,14 @@ describe('ChatController', () => {
   });
 
   it('#sendClosePeer should send a close peer request', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const closed = await instance.sendClosePeer(true);
     expect(closed).toBe(null);
     expect(instance.sendClosePeer).toHaveBeenCalled();
   });
 
   it('#updatePeer should make update peer request', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const peerInfo = instance.activeRoom.peers[0];
     const updated = await instance.updatePeer(peerInfo);
     expect(updated).toBe(null);
@@ -134,7 +136,7 @@ describe('ChatController', () => {
   });
 
   it('#updateRoom should update room', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const roomData = instance.activeRoom;
     const updated = await instance.updateRoom(roomData, true);
     expect(updated).toBe(null);
@@ -142,7 +144,7 @@ describe('ChatController', () => {
   });
 
   it('#newRoom should make new room', async() => {
-    vi.spyOn(easyChatClientInstance, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const newRoom = createMockChatRoom();
     const changed = await instance.newRoom(newRoom);
     expect(changed).toBe(null);
