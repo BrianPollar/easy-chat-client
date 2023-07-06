@@ -210,7 +210,8 @@ export class EasyChatClient {
         reject('No socket connection');
       } else {
         this.socket.emit('onlinerequest', { method, data },
-          this.timeoutCallback((err, response) => {
+          this.timeoutCallback((e
+            rr, response) => {
             if (err) {
               this.logger.error(
                 'sendOnlineSoloRequest::sendRequest %s timeout! socket: %o',
