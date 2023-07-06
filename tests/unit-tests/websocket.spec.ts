@@ -207,33 +207,49 @@ describe('EasyChatClient', () => {
   });
 
   it('#sendRequest should ', async() => {
-    // @ts-ignore
-    vi.spyOn(instance.socket, 'sendOnlineSoloRequest')
-      .mockImplementationOnce(() => null);
-    const tcbSpy = vi.spyOn(instance, 'timeoutCallback');
+    const cbFn = (err, response) => {
 
-    const sent = await instance.sendRequest('met', 'data');
+    };
+    // @ts-ignore
+    const tcbSpy = vi.spyOn(instance, 'timeoutCallback').mockImplementationOnce(() => {
+      cbFn(null, { data: 'okay' });
+    });
+    const sent = await instance.sendRequest('met', 'data', 10);
+    expect(sent).toBeFalsy();
     expect(tcbSpy).toHaveBeenCalled();
   });
 
   it('#sendOnlineSoloRequest should ', async() => {
-    await instance.sendOnlineSoloRequest('method', 'data');
+    const tcbSpy = vi.spyOn(instance, 'timeoutCallback');
+    await instance.sendOnlineSoloRequest('method', 'data', 10);
+    expect(tcbSpy).toHaveBeenCalled();
   });
 
-  it('#timeoutCallback should ', async() => {
-    await instance.timeoutCallback();
+  it('#timeoutCallback should ', () => {
+    const cb = () => {
+
+    };
+    instance.timeoutCallback(cb);
   });
 
   it('#disconnect should ', () => {
+    // @ts-ignore
+    const sockSpy = vi.spyOn(instance.socket, 'disconnect');
     instance.disconnect();
+    expect(sockSpy).toHaveBeenCalled();
   });
 
   it('#setupEventHandler should ', () => {
+    const sockSpy = vi.spyOn(socketMock, 'on');
     // @ts-ignore
-    instance.setupEventHandler;
+    instance.setupEventHandler(socketMock);
+    expect(sockSpy).toHaveBeenCalledTimes(6);
   });
 
   it('#setupNotificationHandler should ', () => {
+    const sockSpy = vi.spyOn(socketMock, 'on');
+    // @ts-ignore
     instance.setupNotificationHandler();
+    expect(sockSpy).toHaveBeenCalledTimes(1);
   });
 });

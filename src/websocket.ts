@@ -180,7 +180,7 @@ export class EasyChatClient {
     this.setupNotificationHandler();
   }
 
-  sendRequest(method, data?) {
+  sendRequest(method, data?, timeOut = 10000) {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
         this.logger.error('EasyChatClient:connect:: -', 'No socket connection');
@@ -197,21 +197,20 @@ export class EasyChatClient {
               this.logger.debug('sendRequest response: %s', response);
               resolve(response);
             }
-          })
+          }, timeOut)
         );
       }
     });
   }
 
-  sendOnlineSoloRequest(method, data?) {
+  sendOnlineSoloRequest(method, data?, timeOut = 10000) {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
         this.logger.error('EasyChatClient:sendOnlineSoloRequest:: - connect -', 'No socket connection');
         reject('No socket connection');
       } else {
         this.socket.emit('onlinerequest', { method, data },
-          this.timeoutCallback((e
-            rr, response) => {
+          this.timeoutCallback((err, response) => {
             if (err) {
               this.logger.error(
                 'sendOnlineSoloRequest::sendRequest %s timeout! socket: %o',
@@ -220,13 +219,13 @@ export class EasyChatClient {
             } else {
               resolve(response);
             }
-          })
+          }, timeOut)
         );
       }
     });
   }
 
-  timeoutCallback(callback) {
+  timeoutCallback(callback, timeOut = 10000) {
     let called = false;
 
     const interval = setTimeout(() => {
@@ -236,7 +235,7 @@ export class EasyChatClient {
       called = true;
       this.logger.error('EasyChatClient:connect:: -', 'nowRequest timeout');
       callback(new Error('nowRequest timeout'));
-    }, requestTimeout);
+    }, timeOut || requestTimeout);
 
     return (...args) => {
       if (called) {
