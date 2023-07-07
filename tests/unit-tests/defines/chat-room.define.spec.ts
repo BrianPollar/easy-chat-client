@@ -43,7 +43,6 @@ describe('ChatRoom', () => {
     expect(instance.peers[initialPeerlong]).toStrictEqual(newRoomVals.peers[0]);
   });
 
-
   it('#update should update the room by updating peer in the room', () => {
     const initialPeerlong = instance.peers.length;
     const newRoomVals = createMockChatRoom();
