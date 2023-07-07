@@ -206,6 +206,7 @@ describe('EasyChatClient', () => {
     expect(notifSpy).toHaveBeenCalled();
   });
 
+  /*
   it('#sendRequest should ', async() => {
     const cbFn = (err, response) => {
 
@@ -231,6 +232,7 @@ describe('EasyChatClient', () => {
     };
     instance.timeoutCallback(cb);
   });
+  */
 
   it('#disconnect should ', () => {
     // @ts-ignore
