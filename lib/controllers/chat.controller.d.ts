@@ -2,14 +2,11 @@ import { Subject } from 'rxjs';
 import { ChatMsg, ChatRoom } from '../defines/chat-room.define';
 import { IpeerInfo } from '../interfaces/chat.interface';
 import { TchatMsgStatus } from '../types/union.types';
-import { EventbusController } from './eventbus.controller';
 import { LoggerController } from './logger.controller';
 import { EasyChatClient } from '../websocket';
 /** Handle CHAT related Task*/
 export declare class EasyChatController {
     websocket: EasyChatClient;
-    eventbus: EventbusController;
-    private logger;
     private myId;
     private myNames;
     private myPhotoUrl;
@@ -17,7 +14,8 @@ export declare class EasyChatController {
     toPeer: string;
     activeRoom: ChatRoom;
     destroyed$: Subject<unknown>;
-    constructor(websocket: EasyChatClient, eventbus: EventbusController, logger: LoggerController, myId: string, myNames: string, myPhotoUrl: string);
+    logger: LoggerController;
+    constructor(websocket: EasyChatClient, myId: string, myNames: string, myPhotoUrl: string);
     determinLocalPeerInfo(): IpeerInfo;
     joinRoom(): Promise<void>;
     joinMainRoom(): Promise<void>;
@@ -29,10 +27,10 @@ export declare class EasyChatController {
         peers: any;
         joined: boolean;
     }>;
-    send(chatMessage: string): void;
-    updateStatus(status: TchatMsgStatus, msg: ChatMsg): void;
-    deleteRestoreMesage(id: string, deleted: boolean): void;
-    sendClosePeer(stopClass: any): Promise<unknown>;
+    send(chatMessage: string): Promise<void>;
+    updateStatus(status: TchatMsgStatus, msg: ChatMsg): Promise<boolean>;
+    deleteRestoreMesage(id: string, deleted: boolean): Promise<boolean>;
+    sendClosePeer(stopClass: boolean): Promise<unknown>;
     updatePeer(peerInfo: IpeerInfo): Promise<unknown>;
     updateRoom(roomData: any, add: boolean /** add to array or remove if false */): Promise<unknown>;
     newRoom(room: ChatRoom): Promise<unknown>;

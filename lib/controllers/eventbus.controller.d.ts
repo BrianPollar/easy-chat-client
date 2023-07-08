@@ -1,5 +1,5 @@
-import { BehaviorSubject } from "rxjs";
-import { ECHATMETHOD } from "../enums/chat.enum";
+import { BehaviorSubject } from 'rxjs';
+import { ECHATMETHOD } from '../enums/chat.enum';
 export interface IchatEvent {
     type: ECHATMETHOD;
     data?: any;
@@ -8,7 +8,7 @@ export interface IchatEvent {
 export interface IoutEvent {
     type: string;
     data?: any;
-    error?: any;
+    error?: string;
 }
 export declare class EventbusController {
     socket$: BehaviorSubject<any>;
