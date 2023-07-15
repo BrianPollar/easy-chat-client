@@ -12,3 +12,6 @@ export * from './defines/chat-room.define';
 
 // This file exports all of the enum for chat event.
 export * from './enums/chat.enum';
+
+// This file exports all of the interfaces.
+export * from './interfaces/chat.interface';

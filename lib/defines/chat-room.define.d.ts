@@ -13,7 +13,7 @@ export declare const createMockPeerinfo: () => {
     online: boolean;
 };
 export declare const createMockChatRoom: (incrementor?: number) => ChatRoom;
-export declare const createMockChatRooms: (length: number) => number[];
+export declare const createMockChatRooms: (length: number) => ChatRoom[];
 export declare const createMockChatMsg: (incrementor?: number) => ChatMsg;
 export declare const createMockChatMsgs: (length: number) => ChatMsg[];
 export declare abstract class Chat {

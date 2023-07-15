@@ -38,7 +38,7 @@ export const createMockChatRoom = (incrementor = 0) => {
 };
 
 export const createMockChatRooms = (length: number) => {
-  return Array.from({ length }).map((val, index) => (index));
+  return Array.from({ length }).map((val, index) => createMockChatRoom(index));
 };
 
 
