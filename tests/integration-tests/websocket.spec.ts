@@ -40,7 +40,6 @@ describe('Websocket', () => {
     easyChatControllerInstance = easyChatController;
   });
 
-
   it('its real instance of EasyChatClient', () => {
     expect(easyChatClientInstance).toBeInstanceOf(EasyChatClient);
   });

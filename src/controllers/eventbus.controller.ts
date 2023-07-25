@@ -22,19 +22,25 @@ export interface IoutEvent {
   error?: string;
 }
 
+export interface IsocketEvent {
+  type: string;
+  data?;
+  error?;
+}
+
 // This class defines the event bus controller.
 export class EventbusController {
   // The socket observable.
-  socket$ = new BehaviorSubject(null);
+  socket$: BehaviorSubject<IsocketEvent> = new BehaviorSubject<IsocketEvent>(null);
 
   // The chat event observable.
-  chat$: BehaviorSubject<IchatEvent> = new BehaviorSubject<IchatEvent>(null as any);
+  chat$: BehaviorSubject<IchatEvent> = new BehaviorSubject<IchatEvent>(null);
 
   // The user online change observable.
-  userOnlineChange$: BehaviorSubject<boolean> = new BehaviorSubject(null as any);
+  userOnlineChange$: BehaviorSubject<boolean> = new BehaviorSubject(null);
 
   // The out event observable.
-  outEvent: BehaviorSubject<IoutEvent> = new BehaviorSubject(null as any);
+  outEvent: BehaviorSubject<IoutEvent> = new BehaviorSubject(null);
 
   // The constructor of the event bus controller.
   constructor() { }

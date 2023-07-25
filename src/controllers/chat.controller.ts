@@ -13,7 +13,7 @@ import { EasyChatClient } from '../websocket';
 export class EasyChatController {
   messages: ChatMsg[] = [];
   toPeer = 'all';
-  activeRoom: ChatRoom;
+  activeRoom: ChatRoom | undefined;
   destroyed$ = new Subject();
   logger = new LoggerController();
 
@@ -23,6 +23,10 @@ export class EasyChatController {
     private myNames: string,
     private myPhotoUrl: string
   ) {
+    this.runSubscriptions();
+  }
+
+  runSubscriptions() {
     this.websocket.eventbus.chat$
       .pipe(takeUntil((this as this&{destroyed$}).destroyed$))
       .subscribe(event => {
@@ -32,7 +36,7 @@ export class EasyChatController {
             return;
           }
 
-          const peerInfo = this.activeRoom.getPeerInfo(from) as any;
+          const peerInfo = this.activeRoom.getPeerInfo(from);
           const msg = new ChatMsg(
             this.myId,
             {
@@ -85,34 +89,36 @@ export class EasyChatController {
         }
 
         if (event && event.type === ECHATMETHOD.UPDATE_STATUS) {
-          const { to, id, statusField, statusQuo, status } = event.data;
+          const { id, status } = event.data;
           const msg = this.messages
             .find(val => val.id === id);
           if (msg) {
             msg.status = status;
-            const exist = msg[statusField]
+            /**
+             * const exist = msg[statusField]
               .find(val => val.id === statusQuo.id);
             if (!exist) {
               msg[statusField].push(statusQuo);
-            }
-          }
-          if (status === 'viewed') {
-            this.websocket.eventbus.outEvent.next({
-              type: 'viewed',
-              data: this.activeRoom.unviewedMsgsLength
-            });
-            if (this.activeRoom.unviewedMsgsLength > 0) {
-              this.activeRoom.unviewedMsgsLength--;
+            }*/
+
+            if (status === 'viewed') {
+              this.websocket.eventbus.outEvent.next({
+                type: 'viewed',
+                data: this.activeRoom.unviewedMsgsLength
+              });
+              if (this.activeRoom.unviewedMsgsLength > 0) {
+                this.activeRoom.unviewedMsgsLength--;
+              }
             }
           }
         }
 
         if (event && event.type === ECHATMETHOD.PEER_UPDATE) {
           const { peerInfo } = event.data;
-          const localPeerInfo = this.activeRoom.getPeerInfo(peerInfo);
+          const localPeerInfo = this.activeRoom.getPeerInfo(peerInfo.id);
           if (localPeerInfo) {
-            peerInfo.roomAdmin = peerInfo.roomAdmin;
-            peerInfo.muted = peerInfo.muted;
+            localPeerInfo.roomAdmin = peerInfo.roomAdmin;
+            // localPeerInfo.muted = peerInfo.muted;
             // if new props the add here
           }
         }
@@ -169,22 +175,22 @@ export class EasyChatController {
   }
 
 
-  async joinMain(params: any) {
+  async joinMain(params) {
     const callRes = await this.websocket.sendOnlineSoloRequest(
       ECHATMETHOD.JOIN,
       params
     );
 
-    return callRes as { peers: any; joined: boolean };
+    return callRes as { peers: IpeerInfo[]; joined: boolean };
   }
 
-  async join(params: any) {
+  async join(params) {
     const callRes = await this.websocket.sendRequest(
       ECHATMETHOD.JOIN,
       params
     );
 
-    return callRes as { peers: any; joined: boolean };
+    return callRes as { peers: IpeerInfo[]; joined: boolean };
   }
 
   send(chatMessage: string) {
@@ -309,7 +315,8 @@ export class EasyChatController {
   }
 
   clearRoom() {
-    this.activeRoom = null as any;
+    // eslint-disable-next-line no-undefined
+    this.activeRoom = undefined;
     this.messages.length = 0;
     this.messages = [];
   }
@@ -332,7 +339,7 @@ export class EasyChatController {
     this.websocket.eventbus.userOnlineChange$.next(true);
   }
 
-  private newPeer(data: any) {
+  private newPeer(data: Partial<IpeerInfo>) {
     const { id } = data;
     const peerInfo = this.getPeerInfo(id);
     if (peerInfo) {
@@ -346,9 +353,7 @@ export class EasyChatController {
       name: data.name,
       photo: data.photo,
       roomAdmin: data.roomAdmin,
-      muted: data.muted,
       online: data.online,
-      whoType: data.whoType,
       lastSeen: new Date(),
       unviewedMsgsLength: data.unviewedMsgsLength
     };

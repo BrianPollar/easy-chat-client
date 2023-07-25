@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { makeRandomString } from '../constants/makerandomstring.constant';
 import { IchatMsg, IchatRoom, IpeerInfo } from '../interfaces/chat.interface';
 import { TchatMsgStatus, TchatMsgWho } from '../types/union.types';
 import { faker } from '@faker-js/faker';
@@ -27,14 +25,15 @@ export const createMockChatRoom = (incrementor = 0) => {
   const room = {
     ...createMockChat(),
     lastActive: faker.date.past(),
-    peers: [createMockPeerinfo(), createMockPeerinfo()],
+    peers: [createMockPeerinfo(), createMockPeerinfo()] as unknown as IpeerInfo[],
     blocked: [],
     unviewedMsgsLength: 10,
     type: incrementor % 2 ? 'solo' : 'bargain',
-    closed: false
-  };
+    closed: false,
+    extras: null
+  } as Required<IchatRoom>;
 
-  return new ChatRoom(room as any);
+  return new ChatRoom(room);
 };
 
 export const createMockChatRooms = (length: number) => {
@@ -45,14 +44,14 @@ export const createMockChatRooms = (length: number) => {
 export const createMockChatMsg = (incrementor = 0) => {
   const msg = {
     ...createMockChat(),
-    peerInfo: createMockPeerinfo(),
+    peerInfo: createMockPeerinfo() as unknown as IpeerInfo,
     roomId: faker.string.uuid(),
     msg: faker.string.alphanumeric(),
     who: incrementor % 2 ? 'me' : 'partner',
     status: 'sent',
     deleted: false
-  };
-  return new ChatMsg(faker.string.uuid(), msg as any);
+  } as IchatMsg;
+  return new ChatMsg(faker.string.uuid(), msg);
 };
 
 export const createMockChatMsgs = (length: number) => {
@@ -66,13 +65,6 @@ export abstract class Chat {
   constructor(data: IchatRoom | IchatMsg) {
     this.id = data.id;
     this.createTime = data.createTime;
-  }
-
-  static makeChatDummy(incrementor = 0) {
-    return {
-      id: incrementor + makeRandomString(11, 'combined'),
-      createTime: new Date()
-    };
   }
 }
 

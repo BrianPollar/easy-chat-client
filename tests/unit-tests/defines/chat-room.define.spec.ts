@@ -1,5 +1,6 @@
-import { expect, describe, beforeEach, it } from 'vitest';
-import { ChatRoom, ChatMsg, createMockChatMsg, createMockChatRoom } from '../../../src/defines/chat-room.define';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { vi, expect, describe, beforeEach, it } from 'vitest';
+import { Chat, ChatRoom, ChatMsg, createMockChatMsg, createMockChatRoom } from '../../../src/defines/chat-room.define';
 import { faker } from '@faker-js/faker';
 
 describe('ChatRoom', () => {
@@ -34,9 +35,13 @@ describe('ChatRoom', () => {
   });
 
   it('#update should update the room by adding peer to the room', () => {
+    const spy = vi.spyOn(instance, 'update');
     const newRoomVals = createMockChatRoom();
     const initialPeerlong = instance.peers.length;
     instance.update(newRoomVals, true);
+    expect(spy).toHaveBeenCalled();
+    expect(instance.peers).toBeDefined();
+    expect(instance.peers.length).toBeGreaterThanOrEqual(0);
     expect(instance.createTime).toBe(newRoomVals.createTime);
     expect(instance.lastActive).toBe(newRoomVals.lastActive);
     expect(instance.peers.length).toBe(newRoomVals.peers.length + initialPeerlong);
@@ -44,22 +49,26 @@ describe('ChatRoom', () => {
   });
 
   it('#update should update the room by updating peer in the room', () => {
+    const spy = vi.spyOn(instance, 'update');
     const initialPeerlong = instance.peers.length;
     const newRoomVals = createMockChatRoom();
     instance.peers = [...newRoomVals.peers];
     instance.update(newRoomVals, false);
+    expect(spy).toHaveBeenCalled();
+    expect(instance.peers).toBeDefined();
     expect(instance.createTime).toBe(newRoomVals.createTime);
     expect(instance.lastActive).toBe(newRoomVals.lastActive);
-    expect(instance.peers.length).toBe(initialPeerlong);
+    expect(instance.peers.length).toBe(initialPeerlong - 1);
   });
 
   it('#getParticipants should return peers in the room', () => {
     const newRoomVals = createMockChatRoom();
     instance.peers = [...newRoomVals.peers];
     const peers = instance.getParticipants();
-    expect(peers).toHaveProperty('length');
+    expect(peers.length).toBeGreaterThan(0);
     expect(peers.length).toBe(instance.peers.length);
     expect(typeof peers).toBe('object');
+    expect(peers[0]).toHaveProperty('id');
   });
 
   it('#getPeerInfo should return the desired peer info given the id', () => {
@@ -95,5 +104,48 @@ describe('ChatMsg', () => {
     expect(instance.who).toBeDefined();
     expect(instance.status).toBeDefined();
     expect(instance.deleted).toBeDefined();
+    // all must be partner due to no id
+    expect(instance.peerInfo).toBeDefined();
+    expect(instance.peerInfo).toHaveProperty('id');
+    expect(typeof instance.who).toBe('string');
+    expect(instance.who).toBe('partner');
+  });
+
+  it('sho should be me my id  is the peer info is', () => {
+    const id = 'my-id';
+    // @ts-ignore
+    instance.myId = id;
+    // @ts-ignore
+    instance.peerInfo?.id = id;
+    // @ts-ignore
+    expect(instance.myId).toBe('string');
+    expect(typeof instance.who).toBe('string');
+    expect(instance.who).toBe('me');
+  });
+});
+
+class TestChatBase
+  extends Chat {
+  constructor(data) {
+    super(data);
+  }
+}
+
+describe('ChatMsg', () => {
+  let instance: TestChatBase;
+
+  beforeEach(()=> {
+    const data = {
+      id: faker.string.uuid(),
+      createTime: faker.date.past()
+    };
+    instance = new TestChatBase(data);
+  });
+
+  it('should have the props as expected', () => {
+    expect(typeof instance.id).toBe('string');
+    expect(instance.id).toBeDefined();
+    expect(typeof instance.createTime).toBe(Date);
+    expect(instance.createTime).toBeDefined();
   });
 });

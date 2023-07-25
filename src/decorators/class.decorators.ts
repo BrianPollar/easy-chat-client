@@ -20,6 +20,7 @@ export const autoUnsub = () => (componentClass: any) => {
     // componentClass.prototype.destroyed$.unsubscribe();
     if (origNgOnDestroy) {
       // console.log('ORGIS DESTRUCTIONS FN IS', origNgOnDestroy);
+      // eslint-disable-next-line prefer-rest-params
       origNgOnDestroy.apply(this, arguments);
     }
   };
