@@ -33,7 +33,9 @@ export const createMockChatRoom = (incrementor = 0) => {
     extras: null
   } as Required<IchatRoom>;
 
-  return new ChatRoom(room);
+  const roomy = new ChatRoom(room);
+  console.log('PROTO', roomy['prototype']);
+  return roomy;
 };
 
 export const createMockChatRooms = (length: number) => {
@@ -58,7 +60,7 @@ export const createMockChatMsgs = (length: number) => {
   return Array.from({ length }).map((val, index) => createMockChatMsg(index));
 };
 
-export abstract class Chat {
+export class Chat {
   id: string;
   createTime: Date;
 

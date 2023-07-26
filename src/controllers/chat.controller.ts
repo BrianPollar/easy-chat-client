@@ -28,7 +28,7 @@ export class EasyChatController {
 
   runSubscriptions() {
     this.websocket.eventbus.chat$
-      .pipe(takeUntil((this as this&{destroyed$}).destroyed$))
+      .pipe(takeUntil((this.destroyed$)))
       .subscribe(event => {
         if (event && event.type === ECHATMETHOD.CHAT_MESSAGE) {
           const { from, chatMessage, to, id, createTime } = event.data;

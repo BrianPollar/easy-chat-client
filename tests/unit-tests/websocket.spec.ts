@@ -51,157 +51,146 @@ describe('EasyChatClient', () => {
   });
 
   it('#roomCreated should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.roomCreated(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.ROOM_CREATED);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.ROOM_CREATED,
+      data
+    });
   });
 
   it('#chatMessage should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.chatMessage(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.CHAT_MESSAGE);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.CHAT_MESSAGE,
+      data
+    });
   });
 
   it('#deleteMessage should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.deleteMessage(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.DELETE_MESSAGE);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.DELETE_MESSAGE,
+      data
+    });
   });
 
   it('#newPeer should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.newPeer(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.NEW_PEER);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.NEW_PEER,
+      data
+    });
   });
 
   it('#newMainPeer should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.newMainPeer(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.NEW_MAIN_PEER);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.NEW_MAIN_PEER,
+      data
+    });
   });
 
   it('#peerClosed should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.peerClosed(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.PEER_CLOSE);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.PEER_CLOSE,
+      data
+    });
   });
 
   it('#mainPeerClosed should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.mainPeerClosed(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.MAIN_PEER_CLOSE);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.MAIN_PEER_CLOSE,
+      data
+    });
   });
 
   it('#updateStatus should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.updateStatus(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.UPDATE_STATUS);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.UPDATE_STATUS,
+      data
+    });
   });
 
   it('#updatePeer should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.updatePeer(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.PEER_UPDATE);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.PEER_UPDATE,
+      data
+    });
   });
 
   it('#updateRoom should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.updateRoom(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.UPDATE_ROOM);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.UPDATE_ROOM,
+      data
+    });
   });
 
   it('#updateRoomOnNew should ', () => {
+    const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     const data = {
-      value: null
+      data: {}
     };
     // @ts-ignore
     instance.updateRoomOnNew(data);
-    setTimeout(() => {
-      expect(val).toBeDefined();
-      expect(val.type).toBe(ECHATMETHOD.UPDATE_ROOMS_ON_NEW);
-      expect(typeof val.data).toBe('object');
-      expect(val.data).toStrictEqual(data);
-    }, tickTimeOut);
+    expect(spy).toHaveBeenCalledWith({
+      type: ECHATMETHOD.UPDATE_ROOMS_ON_NEW,
+      data
+    });
   });
 
   it('#currSocket should ', () => {
@@ -260,7 +249,7 @@ describe('EasyChatClient', () => {
 
   it('should call the callback function with provided arguments', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'error');
+    vi.spyOn(instance.logger, 'pError');
     const callbackWrapper = instance.timeoutCallback(timeOutCallback);
     const args = ['arg1', 'arg2'];
     callbackWrapper(...args);
@@ -271,7 +260,7 @@ describe('EasyChatClient', () => {
 
   it('should call the callback function with an error if timeout occurs', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'error');
+    vi.spyOn(instance.logger, 'pError');
     vi.useFakeTimers();
     // const callbackWrapper =
     instance.timeoutCallback(timeOutCallback, 1000);
@@ -283,7 +272,7 @@ describe('EasyChatClient', () => {
 
   it('should not call the callback function if already called', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'error');
+    vi.spyOn(instance.logger, 'pError');
     const callbackWrapper = instance.timeoutCallback(timeOutCallback);
     const args1 = ['arg1', 'arg2'];
     const args2 = ['arg3', 'arg4'];
@@ -296,20 +285,22 @@ describe('EasyChatClient', () => {
   });
 
   it('#disconnect should ', () => {
+    const spy = vi.spyOn(socketMock, 'disconnect');
     instance.disconnect();
+    expect(spy).toHaveBeenCalled();
     expect(instance.currSocket.disconnected).toBe(true);
   });
 
   it('should emit SOCKET_CONNECTED event on socket connect', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'debug');
+    vi.spyOn(instance.logger, 'pDebug');
     const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     // const connectHandler =
     // @ts-ignore
-    instance.setupEventHandler(socket);
+    instance.setupEventHandler(socketMock);
     socketMock.emit('connect');
     // @ts-ignore
-    expect(instance.logger.debug).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - socket connected !');
+    expect(instance.logger.Pdebug).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - socket connected !');
     expect(spy).toHaveBeenCalledWith({
       type: ECHATMETHOD.SOCKET_CONNECTED
     });
@@ -317,36 +308,36 @@ describe('EasyChatClient', () => {
 
   it('should log warning on socket connect error', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'warn');
+    vi.spyOn(instance.logger, 'pWarn');
     // const connectErrorHandler =
     // @ts-ignore
     instance.setupEventHandler(socket);
     socketMock.emit('connect_error');
     // @ts-ignore
-    expect(instance.logger.warn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - reconnect_failed !');
+    expect(instance.logger.pWarn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - reconnect_failed !');
   });
 
   it('should log warning on socket connect timeout', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'warn');
+    vi.spyOn(instance.logger, 'pWarn');
     // const connectTimeoutHandler =
     // @ts-ignore
     instance.setupEventHandler(socket);
     socketMock.emit('connect_timeout');
     // @ts-ignore
-    expect(instance.logger.warn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - connect_timeout !');
+    expect(instance.logger.pWarn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - connect_timeout !');
   });
 
   it('should emit SOCKET_DISCONNECTED event on socket disconnect', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'error');
+    vi.spyOn(instance.logger, 'pError');
     const spy = vi.spyOn(instance.eventbus.chat$, 'next');
     // const disconnectHandler =
     // @ts-ignore
     instance.setupEventHandler(socket);
     socketMock.emit('disconnect', 'reason');
     // @ts-ignore
-    expect(instance.logger.error).toHaveBeenCalledWith(
+    expect(instance.logger.pError).toHaveBeenCalledWith(
       'EasyChatClient:setupEventHandler:: - Socket disconnect, reason: %s',
       'reason'
     );
@@ -357,13 +348,13 @@ describe('EasyChatClient', () => {
 
   it('should log debug message on socket reconnect', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'debug');
+    vi.spyOn(instance.logger, 'pDebug');
     // const reconnectHandler =
     // @ts-ignore
     instance.setupEventHandler(socket);
     socketMock.emit('reconnect', 1);
     // @ts-ignore
-    expect(instance.logger.debug).toHaveBeenCalledWith(
+    expect(instance.logger.pDebug).toHaveBeenCalledWith(
       'EasyChatClient:setupEventHandler:: - "reconnect" event [attempts:"%s"]',
       1
     );
@@ -371,13 +362,13 @@ describe('EasyChatClient', () => {
 
   it('should log warning on socket reconnect failed', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'warn');
+    vi.spyOn(instance.logger, 'pWarn');
     // const reconnectFailedHandler =
     // @ts-ignore
     instance.setupEventHandler(socket);
     socketMock.emit('reconnect_failed');
     // @ts-ignore
-    expect(instance.logger.warn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - reconnect_failed !');
+    expect(instance.logger.pWarn).toHaveBeenCalledWith('EasyChatClient:setupEventHandler:: - reconnect_failed !');
   });
 
   it('#setupEventHandler should ', () => {
@@ -395,21 +386,21 @@ describe('EasyChatClient', () => {
 
   it('should call the corresponding method when a valid notification is received', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'debug');
+    vi.spyOn(instance.logger, 'pDebug');
     // @ts-ignore
     instance.setupNotificationHandler();
     socketMock.emit('mainnotification', { method: 'someMethod', data: 'someData' });
     // @ts-ignore
-    expect(instance.logger.debug).toHaveBeenCalled();
+    expect(instance.logger.pDebug).toHaveBeenCalled();
   });
 
   it('should log a warning and return early when an invalid notification method is received', () => {
     // @ts-ignore
-    vi.spyOn(instance.logger, 'warn');
+    vi.spyOn(instance.logger, 'pWarn');
     // @ts-ignore
     instance.setupNotificationHandler();
     socketMock.emit('mainnotification', { method: 'invalidMethod', data: 'someData' });
     // @ts-ignore
-    expect(instance.logger.warn).toHaveBeenCalledWith('EasyChatClient:setupNotificationHandler:: - mainnotification method: invalidMethod, do not register!');
+    expect(instance.logger.pWarn).toHaveBeenCalledWith('EasyChatClient:setupNotificationHandler:: - mainnotification method: invalidMethod, do not register!');
   });
 });

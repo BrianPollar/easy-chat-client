@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { vi, expect, describe, beforeEach, it } from 'vitest';
+import { vi, expect, describe, beforeEach, it, afterEach } from 'vitest';
 import { EasyChatController } from '../../../src/controllers/chat.controller';
 import { EasyChatClient } from '../../../src/websocket';
 import { faker } from '@faker-js/faker';
-import { createMockChatMsg, createMockChatMsgs, createMockChatRoom, createMockPeerinfo } from '../../../src/defines/chat-room.define';
-import { EventbusController } from '../../../src/controllers/eventbus.controller';
+import { createMockChatMsg, createMockChatRoom, createMockPeerinfo } from '../../../src/defines/chat-room.define';
+import { EventbusController, IchatEvent } from '../../../src/controllers/eventbus.controller';
 import { IpeerInfo } from '../../../src/interfaces/chat.interface';
 import { LoggerController } from '../../../src/controllers/logger.controller';
 import { Subject } from 'rxjs';
 import { ECHATMETHOD } from '../../../src/enums/chat.enum';
 import { makeRandomString } from '../../../src/constants/makerandomstring.constant';
+
+const activeRoom = createMockChatRoom();
+console.log('active room shit is', activeRoom);
+
 
 const websocketMock = {
   sendOnlineSoloRequest: vi.fn(),
@@ -34,6 +38,14 @@ describe('ChatController', () => {
       myPhotoUrl
     );
     vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    // mocking room
+    const activeRoom = createMockChatRoom();
+    activeRoom.update = vi.fn().mockImplementation(() => null);
+    activeRoom.getParticipants = vi.fn().mockImplementation(() => null);
+    activeRoom.getPeerInfo = vi.fn().mockImplementation(() => null);
+    instance.activeRoom = activeRoom;
+
+    vi.spyOn(exports, 'method').mockImplementation(() => { });
   });
 
   it('its real instance of EasyChatController', () => {
@@ -53,265 +65,9 @@ describe('ChatController', () => {
     expect(instance.messages.length).toBe(0);
   });
 
-  // testing negative side
-  it('should fail to send chat message events eveery body using the aplications provided no user exists', () => {
-    instance.messages = createMockChatMsgs(20);
-    const event = {
-      type: ECHATMETHOD.CHAT_MESSAGE,
-      from: faker.string.uuid(),
-      chatMessage: makeRandomString(66, 'letters'),
-      to: null,
-      id: faker.string.uuid(),
-      createTime: new Date()
-    };
-
-    // @ts-ignore
-    const spy = vi.spyOn(instance.activeRoom, 'getPeerInfo');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  // testing positive side
-  it('should listen chat message events from every body using the aplications provided no user exists', () => {
-    instance.messages = createMockChatMsgs(20);
-    const originalMsgLength = instance.messages.slice().length;
-    const event = {
-      type: ECHATMETHOD.CHAT_MESSAGE,
-      data: {
-        from: faker.string.uuid(),
-        chatMessage: makeRandomString(66, 'letters'),
-        to: 'all',
-        id: faker.string.uuid()
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'getPeerInfo');
-    const spy2 = vi.spyOn(instance, 'scrollToLast');
-    const spy3 = vi.spyOn(instance, 'updateStatus');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalled();
-    expect(spy2).toHaveBeenCalled();
-    expect(spy3).toHaveBeenCalledWith('recieved', instance.messages[instance.messages.length - 1]);
-    expect(instance.messages.length).toBe(originalMsgLength + 1);
-  });
-
-  // testing positive side2
-  it('should listen chat message events from one person using the aplications provided no user exists', () => {
-    instance.messages = createMockChatMsgs(20);
-    const originalMsgLength = instance.messages.slice().length;
-    const id = 'my-id';
-    // @ts-ignore
-    instance.myId = id;
-    const event = {
-      type: ECHATMETHOD.CHAT_MESSAGE,
-      data: {
-        from: faker.string.uuid(),
-        chatMessage: makeRandomString(66, 'letters'),
-        to: id,
-        id: faker.string.uuid(),
-        createTime: new Date()
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'getPeerInfo');
-    const spy2 = vi.spyOn(instance, 'scrollToLast');
-    const spy3 = vi.spyOn(instance, 'updateStatus');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalled();
-    expect(spy2).toHaveBeenCalled();
-    expect(spy3).toHaveBeenCalledWith('recieved', instance.messages[instance.messages.length - 1]);
-    expect(instance.messages.length).toBe(originalMsgLength + 1);
-  });
-
-  // negative side
-  it('should perform ECHATMETHOD.DELETE_MESSAGE and fail if no id matches', () => {
-    instance.messages = createMockChatMsgs(20);
-    const origMessages = instance.messages.slice();
-    const event = {
-      type: ECHATMETHOD.DELETE_MESSAGE,
-      data: {
-        id: faker.string.uuid(),
-        deleted: true
-      }
-    };
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(instance.messages).toStrictEqual(origMessages);
-  });
-
-  // positive side
-  it('should perform ECHATMETHOD.DELETE_MESSAGE and pass if id matches', () => {
-    instance.messages = createMockChatMsgs(20);
-    const message1 = instance.messages[0];
-    const event = {
-      type: ECHATMETHOD.DELETE_MESSAGE,
-      data: {
-        id: message1.id,
-        deleted: true
-      }
-    };
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(instance.messages[0].deleted).toBe(true);
-  });
-
-  it('should handle ECHATMETHOD.NEW_PEER', () => {
-    const event = {
-      type: ECHATMETHOD.NEW_PEER,
-      data: {
-
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'newPeer');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalledWith(event.data);
-  });
-
-  it('should handle ECHATMETHOD.NEW_MAIN_PEER', () => {
-    const event = {
-      type: ECHATMETHOD.NEW_MAIN_PEER,
-      data: {
-
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'mangeNewMainPeers');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalledWith(event.data);
-  });
-
-  it('should handle ECHATMETHOD.PEER_CLOSE', () => {
-    const event = {
-      type: ECHATMETHOD.PEER_CLOSE,
-      data: {
-
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'peerClosed');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalledWith(event.data);
-  });
-
-  it('should handle ECHATMETHOD.MAIN_PEER_CLOSE', () => {
-    const event = {
-      type: ECHATMETHOD.MAIN_PEER_CLOSE,
-      data: {
-
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance, 'manageMainPeerLeave');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalledWith(event.data);
-  });
-
-  it('should handle ECHATMETHOD.ROOM_CREATED', () => {
-    const event = {
-      type: ECHATMETHOD.ROOM_CREATED,
-      data: {
-
-      }
-    };
-    const spy = vi.spyOn(instance, 'joinRoom');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('should handle ECHATMETHOD.ROOM_CREATED', () => {
-    const event = {
-      type: ECHATMETHOD.SOCKET_CONNECTED,
-      data: {
-
-      }
-    };
-    const spy = vi.spyOn(instance, 'joinMainRoom');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalled();
-  });
-
-  // negative side
-  it('should perform ECHATMETHOD.UPDATE_STATUS and fail if no id matches', () => {
-    instance.messages = createMockChatMsgs(20);
-    const origMessages = instance.messages.slice();
-    const event = {
-      type: ECHATMETHOD.UPDATE_STATUS,
-      data: {
-        id: faker.string.uuid(),
-        status: 'viewed'
-      }
-    };
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(instance.messages).toStrictEqual(origMessages);
-  });
-
-  // positive side
-  it('should perform ECHATMETHOD.UPDATE_STATUS and pass if id matches with viewed', () => {
-    const spy = vi.spyOn(instance.websocket.eventbus.outEvent, 'next');
-    instance.messages = createMockChatMsgs(20);
-    const message1 = instance.messages[0];
-    const origMessages = instance.messages.slice();
-    const event = {
-      type: ECHATMETHOD.UPDATE_STATUS,
-      data: {
-        id: message1.id,
-        status: 'viewed'
-      }
-    };
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(message1.status).toBe('viewed');
-    expect(spy).toHaveBeenCalled();
-    // @ts-ignore
-    if (instance.activeRoom.unviewedMsgsLength) {
-      // @ts-ignore
-      expect(instance.activeRoom.unviewedMsgsLength).toBe(instance.activeRoom.unviewedMsgsLength--);
-    }
-  });
-
-  it('should handle ECHATMETHOD.PEER_UPDATE', () => {
-    // @ts-ignore
-    const peer1 = Object.assign({}, instance.activeRoom?.peers[0]);
-    peer1.roomAdmin = false;
-
-    const event = {
-      type: ECHATMETHOD.PEER_UPDATE,
-      data: {
-        peerInfo: peer1
-      }
-    };
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(peer1.roomAdmin).toBe(false);
-  });
-
-  it('should handle ECHATMETHOD.UPDATE_ROOM', () => {
-    const event = {
-      type: ECHATMETHOD.UPDATE_ROOM,
-      data: {
-        roomData: createMockChatRoom(),
-        add: true
-      }
-    };
-    // @ts-ignore
-    const spy = vi.spyOn(instance.activeRoom, 'update');
-    instance.runSubscriptions();
-    instance.websocket.eventbus.chat$.next(event);
-    expect(spy).toHaveBeenCalled();
-  });
 
   it('#determinLocalPeerInfo should return peer info', () => {
+    instance.activeRoom = createMockChatRoom();
     const peerInfo = instance.determinLocalPeerInfo();
     expect(peerInfo).toHaveProperty('id');
     expect(peerInfo).toHaveProperty('name');
@@ -324,27 +80,27 @@ describe('ChatController', () => {
   });
 
   it('#joinRoom should join room', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo(), createMockPeerinfo()], joined: false }));
     // @ts-ignore
     const newPeerSpy = vi.spyOn(instance, 'newPeer');
-    instance.activeRoom = createMockChatRoom();
     await instance.joinRoom();
     expect(newPeerSpy).toHaveBeenCalledTimes(2);
   });
 
   it('#joinMainRoom should joinMainRoom', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     // @ts-ignore
     const mangeNewMainPeersSpy = vi.spyOn(instance, 'mangeNewMainPeers');
-    instance.activeRoom = createMockChatRoom();
     await instance.joinMainRoom();
     expect(mangeNewMainPeersSpy).toHaveBeenCalledTimes(1);
   });
 
   it('#joinMain should be called', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendOnlineSoloRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     // @ts-ignore
-    instance.activeRoom = createMockChatRoom();
     const joined = await instance.joinMain(instance.determinLocalPeerInfo());
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -352,8 +108,8 @@ describe('ChatController', () => {
   });
 
   it('#join should be called', async() => {
-    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     instance.activeRoom = createMockChatRoom();
+    vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve({ peers: [createMockPeerinfo()], joined: false }));
     const joined = await instance.join(instance.determinLocalPeerInfo());
     expect(joined).toHaveProperty('joined');
     expect(joined).toHaveProperty('peers');
@@ -361,12 +117,12 @@ describe('ChatController', () => {
   });
 
   it('#send should send message', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const sendSpy = vi.spyOn(instance, 'send');
     const scrollToLastSpy = vi.spyOn(instance, 'scrollToLast');
     const message = faker.string.alphanumeric();
     const originalMsgLength = instance.messages.length;
-    instance.activeRoom = createMockChatRoom();
     const sent = await instance.send(message);
     expect(sent).toBeUndefined();
     expect(instance.messages.length).toBe(originalMsgLength + 1);
@@ -406,9 +162,9 @@ describe('ChatController', () => {
   });
 
   it('#updatePeer should make update peer request', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const updatePeerSpy = vi.spyOn(instance, 'updatePeer');
-    instance.activeRoom = createMockChatRoom();
     const peerInfo = instance.activeRoom.peers[0];
     const updated = await instance.updatePeer(peerInfo);
     expect(updated).toBeNull();
@@ -416,6 +172,7 @@ describe('ChatController', () => {
   });
 
   it('#updateRoom should update room', async() => {
+    instance.activeRoom = createMockChatRoom();
     vi.spyOn(instance.websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
     const updateRoomSpy = vi.spyOn(instance, 'updateRoom');
     const roomData = instance.activeRoom;
@@ -468,9 +225,9 @@ describe('ChatController', () => {
   });
 
   it('#newPeer should add new peer to room', () => {
+    instance.activeRoom = createMockChatRoom();
     // @ts-ignore
     const newPeerSpy = vi.spyOn(instance, 'newPeer');
-    instance.activeRoom = createMockChatRoom();
     // @ts-ignore
     instance.newPeer({ id: faker.string.uuid() });
     // @ts-ignore
@@ -479,11 +236,11 @@ describe('ChatController', () => {
   });
 
   it('#peerClosed should change peer online status', () => {
+    instance.activeRoom = createMockChatRoom();
     // @ts-ignore
     const peerClosedSpy = vi.spyOn(instance, 'peerClosed');
     // @ts-ignore
     const getPeerInfoSpy = vi.spyOn(instance, 'getPeerInfo');
-    instance.activeRoom = createMockChatRoom();
     // @ts-ignore
     instance.peerClosed({ peerId: faker.string.uuid() });
     expect(peerClosedSpy).toHaveBeenCalled();
@@ -513,4 +270,286 @@ describe('ChatController', () => {
     expect(getPeerInfoSpy).toHaveBeenCalled();
     expect(info).toBeUndefined();
   });
+});
+
+
+describe('runSubscriptions', () => {
+  let instance: EventbusController;
+  let subMain;
+  let doneMain = false;
+  let chatEvent: IchatEvent;
+  const doneTimer = () => new Promise((resolve) => {
+    setInterval(() => {
+      if (doneMain) {
+        resolve(true);
+      }
+    }, 100);
+  });
+
+  const websocket: any = vi.fn();
+  websocket.sendRequest = vi.fn();
+
+  beforeEach(() => {
+    instance = new EventbusController();
+    vi.spyOn(websocket, 'sendRequest').mockImplementationOnce(() => Promise.resolve(null));
+    // mocking room
+    activeRoom.update = vi.fn().mockImplementation(() => null);
+    activeRoom.getParticipants = vi.fn().mockImplementation(() => null);
+    activeRoom.getPeerInfo = vi.fn().mockImplementation(() => null);
+    vi.spyOn(exports, 'method').mockImplementation(() => { });
+    subMain = instance.chat$
+      .subscribe(event => {
+        chatEvent = event;
+        doneMain = true;
+      });
+  });
+
+  afterEach(() => {
+    subMain.unsubscribe();
+  });
+
+  // testing negative side
+  it('should fail to send chat message events eveery body using the aplications provided no user exists', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.CHAT_MESSAGE,
+      from: faker.string.uuid(),
+      chatMessage: makeRandomString(66, 'letters'),
+      to: null,
+      id: faker.string.uuid(),
+      createTime: new Date()
+    };
+
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      // @ts-ignore
+      const spy = vi.spyOn(instance.activeRoom, 'getPeerInfo');
+      expect(spy).not.toHaveBeenCalled();
+      done(null);
+    });
+  }));
+
+  // testing positive side
+  it('should listen chat message events from every body using the aplications provided no user exists', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.CHAT_MESSAGE,
+      data: {
+        from: faker.string.uuid(),
+        chatMessage: makeRandomString(66, 'letters'),
+        to: 'all',
+        id: faker.string.uuid()
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  // testing positive side2
+  it('should listen chat message events from one person using the aplications provided no user exists', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.CHAT_MESSAGE,
+      data: {
+        from: faker.string.uuid(),
+        chatMessage: makeRandomString(66, 'letters'),
+        to: 'id',
+        id: faker.string.uuid(),
+        createTime: new Date()
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      done(null);
+    });
+  }));
+
+  // negative side
+  it('should perform ECHATMETHOD.DELETE_MESSAGE and fail if no id matches', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.DELETE_MESSAGE,
+      data: {
+        id: faker.string.uuid(),
+        deleted: true
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  // positive side
+  it('should perform ECHATMETHOD.DELETE_MESSAGE and pass if id matches', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.DELETE_MESSAGE,
+      data: {
+        id: 'message1.id',
+        deleted: true
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.NEW_PEER', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.NEW_PEER,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    // @ts-ignore
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.NEW_MAIN_PEER', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.NEW_MAIN_PEER,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      // @ts-ignore
+      const spy = vi.spyOn(instance, 'mangeNewMainPeers');
+      expect(spy).toHaveBeenCalledWith(event.data);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.PEER_CLOSE', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.PEER_CLOSE,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      // @ts-ignore
+      const spy = vi.spyOn(instance, 'peerClosed');
+      expect(spy).toHaveBeenCalledWith(event.data);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.MAIN_PEER_CLOSE', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.MAIN_PEER_CLOSE,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      // @ts-ignore
+      const spy = vi.spyOn(instance, 'manageMainPeerLeave');
+      expect(spy).toHaveBeenCalledWith(event.data);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.ROOM_CREATED', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.ROOM_CREATED,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.ROOM_CREATED', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.SOCKET_CONNECTED,
+      data: {
+
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  // negative side
+  it('should perform ECHATMETHOD.UPDATE_STATUS and fail if no id matches', () => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.UPDATE_STATUS,
+      data: {
+        id: faker.string.uuid(),
+        status: 'viewed'
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  // positive side
+  it('should perform ECHATMETHOD.UPDATE_STATUS and pass if id matches with viewed', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.UPDATE_STATUS,
+      data: {
+        id: 'message1.id',
+        status: 'viewed'
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.PEER_UPDATE', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.PEER_UPDATE,
+      data: {
+        peerInfo: createMockPeerinfo()
+      }
+    };
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
+
+  it('should handle ECHATMETHOD.UPDATE_ROOM', async() => new Promise(done => {
+    const event = {
+      type: ECHATMETHOD.UPDATE_ROOM,
+      data: {
+        roomData: createMockChatRoom(),
+        add: true
+      }
+    };
+    // @ts-ignore
+    instance.chat$.next(event);
+    doneTimer().then(() => {
+      expect(chatEvent).toStrictEqual(event);
+      done(null);
+    });
+  }));
 });

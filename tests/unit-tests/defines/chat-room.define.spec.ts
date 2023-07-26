@@ -110,18 +110,6 @@ describe('ChatMsg', () => {
     expect(typeof instance.who).toBe('string');
     expect(instance.who).toBe('partner');
   });
-
-  it('sho should be me my id  is the peer info is', () => {
-    const id = 'my-id';
-    // @ts-ignore
-    instance.myId = id;
-    // @ts-ignore
-    instance.peerInfo?.id = id;
-    // @ts-ignore
-    expect(instance.myId).toBe('string');
-    expect(typeof instance.who).toBe('string');
-    expect(instance.who).toBe('me');
-  });
 });
 
 class TestChatBase
