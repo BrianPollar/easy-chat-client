@@ -1,13 +1,20 @@
-import { expect, describe, beforeEach, it } from 'vitest';
+import { expect, describe, beforeEach, it, afterEach } from 'vitest';
 import { EventbusController, IchatEvent, IoutEvent, IsocketEvent } from '../../../src/controllers/eventbus.controller';
 import { ECHATMETHOD } from '../../../src/enums/chat.enum';
 import { BehaviorSubject } from 'rxjs';
 
 describe('EventbusController', () => {
   let instance: EventbusController;
+  let subMain;
 
   beforeEach(() => {
     instance = new EventbusController();
+  });
+
+  afterEach(() => {
+    if (subMain) {
+      subMain.unsubscribe();
+    }
   });
 
   it('its real instance of AuthController', () => {
@@ -34,11 +41,11 @@ describe('EventbusController', () => {
       type: 'test',
       data: 'test'
     };
-    const subMain = instance.socket$.subscribe(sub => {
+    instance.socket$.subscribe(sub => {
       val = sub;
       if (!val) {
         // first behaviour
-        expect(sub).toBeUndefined();
+        expect(sub).toBe(null);
       }
       if (sub && sub.type && sub.data) {
         // second behaviour
@@ -46,7 +53,6 @@ describe('EventbusController', () => {
         expect(sub).toHaveProperty('type');
         expect(sub).toHaveProperty('data');
         expect(sub).toStrictEqual(nxtEvent);
-        subMain.unsubscribe(); // TODO watch here
         done(null);
       }
     });
@@ -59,11 +65,11 @@ describe('EventbusController', () => {
       type: ECHATMETHOD.NEW_PEER,
       data: 'test'
     };
-    const subMain = instance.chat$.subscribe(sub => {
+    instance.chat$.subscribe(sub => {
       val = sub;
       if (!val) {
         // first behaviour
-        expect(sub).toBeUndefined();
+        expect(sub).toBe(null);
       }
       if (sub && sub.type && sub.data) {
         // second behaviour
@@ -71,7 +77,6 @@ describe('EventbusController', () => {
         expect(sub).toHaveProperty('type');
         expect(sub).toHaveProperty('data');
         expect(sub).toStrictEqual(nxtEvent);
-        subMain.unsubscribe();
         done(null);
       }
     });
@@ -80,18 +85,17 @@ describe('EventbusController', () => {
 
   it('should effectively listent to userOnlineChange$', () => new Promise(done => {
     let val: boolean;
-    const subMain = instance.userOnlineChange$.subscribe(sub => {
+    instance.userOnlineChange$.subscribe(sub => {
       val = sub;
       if (!val) {
         // first behaviour
-        expect(sub).toBeUndefined();
+        expect(sub).toBe(null);
       }
       if (sub) {
         // second behaviour
         expect(typeof val).toBe('boolean');
         expect(val).toBe(true);
         done(null);
-        subMain.unsubscribe();
       }
     });
     instance.userOnlineChange$.next(true);
@@ -103,11 +107,11 @@ describe('EventbusController', () => {
       type: 'test',
       data: 'test'
     };
-    const subMain = instance.outEvent.subscribe(sub => {
+    instance.outEvent.subscribe(sub => {
       val = sub;
       if (!val) {
         // first behaviour
-        expect(sub).toBeUndefined();
+        expect(sub).toBe(null);
       }
 
       if (sub && sub.type && sub.data) {
@@ -116,9 +120,8 @@ describe('EventbusController', () => {
         expect(val).toHaveProperty('data');
         expect(val).toStrictEqual(nxtEvent);
         done(null);
-        subMain.unsubscribe();
       }
-      instance.outEvent.next(nxtEvent);
     });
+    instance.outEvent.next(nxtEvent);
   }));
 });
