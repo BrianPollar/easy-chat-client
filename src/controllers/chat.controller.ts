@@ -322,8 +322,10 @@ export class EasyChatController {
   }
 
   scrollToLast() {
+    /* if (document) {
     const elem = document?.getElementById('scroll-after-msg');
     elem?.scrollIntoView();
+    }*/
   }
 
   private mangeNewMainPeers(peers: IpeerInfo[]) {
