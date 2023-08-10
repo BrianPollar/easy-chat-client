@@ -12,19 +12,20 @@ export declare class EasyChatController {
     private myPhotoUrl;
     messages: ChatMsg[];
     toPeer: string;
-    activeRoom: ChatRoom;
+    activeRoom: ChatRoom | undefined;
     destroyed$: Subject<unknown>;
     logger: LoggerController;
     constructor(websocket: EasyChatClient, myId: string, myNames: string, myPhotoUrl: string);
+    runSubscriptions(): void;
     determinLocalPeerInfo(): IpeerInfo;
     joinRoom(): Promise<void>;
     joinMainRoom(): Promise<void>;
     joinMain(params: any): Promise<{
-        peers: any;
+        peers: IpeerInfo[];
         joined: boolean;
     }>;
     join(params: any): Promise<{
-        peers: any;
+        peers: IpeerInfo[];
         joined: boolean;
     }>;
     send(chatMessage: string): Promise<void>;

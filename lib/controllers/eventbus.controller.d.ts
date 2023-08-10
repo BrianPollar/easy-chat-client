@@ -10,8 +10,13 @@ export interface IoutEvent {
     data?: any;
     error?: string;
 }
+export interface IsocketEvent {
+    type: string;
+    data?: any;
+    error?: any;
+}
 export declare class EventbusController {
-    socket$: BehaviorSubject<any>;
+    socket$: BehaviorSubject<IsocketEvent>;
     chat$: BehaviorSubject<IchatEvent>;
     userOnlineChange$: BehaviorSubject<boolean>;
     outEvent: BehaviorSubject<IoutEvent>;

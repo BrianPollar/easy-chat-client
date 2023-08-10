@@ -16,14 +16,10 @@ export declare const createMockChatRoom: (incrementor?: number) => ChatRoom;
 export declare const createMockChatRooms: (length: number) => ChatRoom[];
 export declare const createMockChatMsg: (incrementor?: number) => ChatMsg;
 export declare const createMockChatMsgs: (length: number) => ChatMsg[];
-export declare abstract class Chat {
+export declare class Chat {
     id: string;
     createTime: Date;
     constructor(data: IchatRoom | IchatMsg);
-    static makeChatDummy(incrementor?: number): {
-        id: string;
-        createTime: Date;
-    };
 }
 export declare class ChatRoom extends Chat {
     lastActive: Date;
