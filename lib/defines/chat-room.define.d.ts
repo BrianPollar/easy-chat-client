@@ -1,21 +1,5 @@
 import { IchatMsg, IchatRoom, IpeerInfo } from '../interfaces/chat.interface';
 import { TchatMsgStatus, TchatMsgWho } from '../types/union.types';
-export declare const createMockChat: () => {
-    id: string;
-    createTime: Date;
-};
-export declare const createMockPeerinfo: () => {
-    id: string;
-    photo: string;
-    name: string;
-    roomAdmin: string;
-    lastSeen: Date;
-    online: boolean;
-};
-export declare const createMockChatRoom: (incrementor?: number) => ChatRoom;
-export declare const createMockChatRooms: (length: number) => ChatRoom[];
-export declare const createMockChatMsg: (incrementor?: number) => ChatMsg;
-export declare const createMockChatMsgs: (length: number) => ChatMsg[];
 export declare class Chat {
     id: string;
     createTime: Date;

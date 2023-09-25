@@ -11,7 +11,6 @@ import { Subject } from 'rxjs';
 import { ECHATMETHOD } from '../../../src/enums/chat.enum';
 import { makeRandomString } from '../../../src/constants/makerandomstring.constant';
 
-
 const websocketMock = {
   sendOnlineSoloRequest: vi.fn(),
   sendRequest: vi.fn(),
